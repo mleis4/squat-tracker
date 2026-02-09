@@ -47,11 +47,12 @@ def is_rack_derack(history):
 
 	return False
 
+'''
 def calculate_velocity(coord_deque, mmpp, velocity_list, rep_rest_time, reps, analyzed_rep, change_in_phase):
-	"""
+	
  	Calculates current velocity by taking pixel distance between current and previous coordinate point and multiplying by mmpp.
 	Since each frame takes 1/FPS seconds, we have mm/s every 1/FPS.
-	"""
+	
 	rep_rest_threshold = 80.0
 	rep = False
 	calculated_velocity = (0, 0, 0)
@@ -96,7 +97,7 @@ def calculate_velocity(coord_deque, mmpp, velocity_list, rep_rest_time, reps, an
 			rep, calculated_velocity = analyze_for_rep(velocity_list, reps)
   
 	return velocity_list, rep, calculated_velocity, rep_rest_time, analyzed_rep, change_in_phase, inflection
-	
+'''	
 
 def showInMovedWindow(winname, img, x, y, out, tracking_toggled=False, add_text=False):
 	'''
@@ -124,10 +125,11 @@ def showInMovedWindow(winname, img, x, y, out, tracking_toggled=False, add_text=
  
 	return out
  
+'''
 def showStats(data_df):
-	'''
+	
 	Displays current repetition statistics in a separate window while video is playing.
-	'''
+	
 
 	cv.namedWindow("Velocity Stats:")        # Create a named window
 	cv.moveWindow("Velocity Stats:", 700, 300) 
@@ -151,6 +153,7 @@ def showStats(data_df):
 		cv_drawing_functions.textBGoutline(blank_frame, text, (10, 300 - ((i * 40) + 20)), scaling=.5, text_color=(cv_drawing_functions.BLACK))
  
 	cv.imshow("Velocity Stats:", blank_frame)
+'''
  
 def show_set_avg(data_df):
 	'''
@@ -175,23 +178,31 @@ def show_set_avg(data_df):
 	
 	cv.imshow("Set Velocity Averages", blank_frame)
  
-def findAruco(img, marker_size=6, total_markers=50):
+def findPlate(img):
 	'''
 	Detects AruCo tag within given frame based on provided AruCo dictionary.
 	Returns all AruCo tag candidates, but for our purposes should only be one tag.
+	** Change to: Find the plate **
  	'''
     
-    # Convert frame to grayscale
+     # Convert frame to grayscale
 	gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-	key = getattr(aruco, f'DICT_{marker_size}X{marker_size}_{total_markers}')
-	arucoDict = aruco.Dictionary_get(key)
-	arucoParam = aruco.DetectorParameters_create()
+	
+	# Looks for appropriate parameters of a circle
+	circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=0, maxRadius=0)
  
-	# Looks for markers from the given AruCo dictionary.
-	bbox, ids, rejectedImgPoints = aruco.detectMarkers(gray, arucoDict, parameters=arucoParam)
- 
-	# Return only the accepted AruCo detections
-	return bbox, ids
+	# Draw detected circles
+	if circles is not None:
+		circles = np.uint16(np.around(circles))
+		for i in circles[0, :]:
+			# Draw outer circle
+			cv.circle(img, (i[0], i[1]), i[2], (255, 0, 255), 3)
+			# Draw center of circle
+			cv.circle(img, (i[0], i[1]), 2, (0, 100, 100), 3)
+			# Display results
+			cv.imshow('Detected circles', img)
+			cv.waitKey(0)
+	cv.destroyAllWindows()
 
 def determine_center(corners):
 	'''
@@ -212,11 +223,12 @@ def determine_center(corners):
 
 	return cX, cY
 
+'''
 def calculate_velocity_averages(avg_velocities, peak_velocities, reps):
-	'''
+	
 	After completion of a single repetition, calculates rep aggregates including average velocity, peak velocity
 	and if rep 2 or above, calculates velocity loss from previous repetition.
- 	'''
+ 	
 	
 	# If first rep, calculate only average, peak, and first velocities.
 	if reps == 1:
@@ -233,12 +245,13 @@ def calculate_velocity_averages(avg_velocities, peak_velocities, reps):
 		peak_vel_loss = (peak_velocities[0] - peak_velocities[-1]) / peak_velocities[0] * 100
 	
 		return avg_velocity, peak_velocity, avg_vel_loss, peak_vel_loss
-	
+'''
 
+'''
 def is_inflection(y_velocity, is_eccentric_portion):
-	'''
+	
 	Determines if an inflection has occured. Used in the automatic detection of partial and full repetitions.
- 	'''
+ 	
 	
 	# If in eccentric portion, velocity should be positive. If velocity is negative, then no longer in eccentric (thus, inflection point).
 	if is_eccentric_portion:
@@ -252,11 +265,13 @@ def is_inflection(y_velocity, is_eccentric_portion):
 			return True
 		else:
 			return False
+'''
 
+'''
 def analyze_for_rep(velocity_list, reps):
-	'''
+	
 	Determines current phase of the lift and upon completion of both phases, automatically detects a full repetition.
-	'''
+	
  
 	pos = 0
 	eccentric_phase = False
@@ -346,6 +361,7 @@ def analyze_for_rep(velocity_list, reps):
 			return(True, (avg_vel, peak_vel, last_displacement))
 
 	return(False, (0.0, 0.0, 0))
+'''
 
 def pixel_to_mm(bbox):
 	aruco_perimeter = cv.arcLength(bbox, True)
