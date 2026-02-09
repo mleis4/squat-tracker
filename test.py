@@ -18,7 +18,7 @@ def findPlate(img):
 	gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 	
 	# Looks for appropriate parameters of a circle
-	circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=0, maxRadius=0)
+	circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=100, minRadius=0, maxRadius=0)
  
 	# Draw detected circles
 	if circles is not None:
